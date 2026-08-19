@@ -222,11 +222,23 @@
       font-size: 0.9rem;
       border-top: 1px solid var(--card-border);
       margin-top: 20px;
+      line-height: 1.6;
     }
 
     footer span {
       color: var(--primary);
       font-weight: 600;
+    }
+
+    footer a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+      color: var(--primary-hover);
     }
   </style>
 </head>
@@ -307,7 +319,8 @@
   </div>
 
   <footer>
-    Designed & Created by <span>Yaduraj Singh</span>
+    Designed & Created by <span>Yaduraj Singh</span><br />
+    Have suggestions or feedback? Email: <a href="mailto:yadurajsingh726@gmail.com">yadurajsingh726@gmail.com</a>
   </footer>
 </div>
 
@@ -591,7 +604,6 @@
       return;
     }
 
-    // Pre-fill editable expected classes based on syllabus allotment till Oct 13
     document.getElementById('totalExpectedTillOct').value = sub.defaultTotal;
     document.getElementById('subjectMeta').innerHTML = `
       <strong>Course Code:</strong> ${sub.code} &nbsp;|&nbsp;
@@ -644,17 +656,17 @@
       return;
     }
 
-    // Calculations
     const currentPct = ((attended / heldTillNow) * 100).toFixed(1);
     const remainingClasses = expectedTotal - heldTillNow;
     const totalRequiredForMidterm = Math.ceil(0.75 * expectedTotal);
     const shortfallTillOct = totalRequiredForMidterm - attended;
+    const maxPossibleAttendanceCount = attended + remainingClasses;
+    const maxPossiblePct = ((maxPossibleAttendanceCount / expectedTotal) * 100).toFixed(1);
 
     subResultTitle.innerText = `${sub.name} (${sub.type}) [${sub.code}] — ${sec}, Batch ${batch}`;
     pctDisplay.innerText = `${currentPct}%`;
     resultCard.style.display = 'block';
 
-    // Check Current Debar Status
     if (currentPct >= 75) {
       pctDisplay.style.color = "var(--green)";
       debarTag.className = "debar-banner debar-eligible";
@@ -666,9 +678,10 @@
       statusMsg.innerHTML = `You are currently clear of the debar mark in <strong>${sub.name}</strong>.`;
       detailsBox.innerHTML = `
         • <strong>Current Attendance:</strong> ${attended}/${heldTillNow} (${currentPct}%)<br/>
-        • <strong>Immediate Safe Bunks:</strong> You can miss up to <strong>${safeCurrentBunks}</strong> consecutive upcoming class(es) right now and stay above 75%.<br/>
-        • <strong>Mid-Term Target (Oct 13):</strong> Out of the remaining <strong>${remainingClasses}</strong> class(es), you must attend at least <strong>${Math.max(0, shortfallTillOct)}</strong> more class(es) to maintain $\\ge$75% overall.<br/>
-        • <strong>Total Bunks Remaining Till Oct 13:</strong> You have a total buffer of <strong>${totalSafeBunksTillOct}</strong> more bunk(s) allowed across the remaining term.
+        • <strong>Immediate Safe Bunks:</strong> You can miss up to <strong>${safeCurrentBunks}</strong> consecutive upcoming class(es) right now and stay &ge;75%.<br/>
+        • <strong>Mid-Term Target (Oct 13):</strong> Out of the remaining <strong>${remainingClasses}</strong> class(es), you must attend at least <strong>${Math.max(0, shortfallTillOct)}</strong> more class(es) to maintain 75% overall.<br/>
+        • <strong>Total Bunks Remaining Till Oct 13:</strong> You have a total buffer of <strong>${totalSafeBunksTillOct}</strong> more bunk(s) allowed across the remaining term.<br/>
+        • <strong>Maximum Achievable Attendance:</strong> If you attend all remaining sessions, you can reach up to <strong>${maxPossiblePct}%</strong>.
       `;
     } else {
       pctDisplay.style.color = "var(--red)";
@@ -676,20 +689,20 @@
       debarTag.innerText = "⚠ CURRENTLY IN DEBAR ZONE (< 75%)";
 
       const immediateRecovery = Math.ceil(3 * heldTillNow - 4 * attended);
-      
-      let futureFeasibilityText = "";
+      let targetAssessment = "";
+
       if (shortfallTillOct > remainingClasses) {
-        futureFeasibilityText = `<span style="color: var(--red); font-weight: bold;">Mathematically Impossible:</span> Even if you attend all remaining ${remainingClasses} classes, your max attendance by Oct 13 will be ${(((attended + remainingClasses) / expectedTotal) * 100).toFixed(1)}%.`;
+        targetAssessment = `<span style="color: var(--red); font-weight: bold;">It is impossible to get 75% attendance. Even if you attend all remaining ${remainingClasses} classes with 100% presence, you can get a maximum of only ${maxPossiblePct}% attendance.</span>`;
       } else {
-        futureFeasibilityText = `You must attend at least <strong>${Math.max(0, shortfallTillOct)}</strong> out of the remaining <strong>${remainingClasses}</strong> class(es) to be eligible for Mid-Terms.`;
+        targetAssessment = `You must attend at least <strong>${Math.max(0, shortfallTillOct)}</strong> out of the remaining <strong>${remainingClasses}</strong> class(es) to clear the 75% Mid-Term requirement (Max achievable: <strong>${maxPossiblePct}%</strong>).`;
       }
 
       statusMsg.innerHTML = `Your current standing in <strong>${sub.name}</strong> is below the mandatory 75% cutoff.`;
       detailsBox.innerHTML = `
         • <strong>Current Attendance:</strong> ${attended}/${heldTillNow} (${currentPct}%)<br/>
         • <strong>Immediate Recovery:</strong> You need <strong>${immediateRecovery}</strong> consecutive class(es) with 100% presence right now to return to 75%.<br/>
-        • <strong>Mid-Term Clearance Goal (Oct 13):</strong> ${futureFeasibilityText}<br/>
-        • <strong>Total Target:</strong> You need at least <strong>${totalRequiredForMidterm}</strong> total attendances out of <strong>${expectedTotal}</strong> scheduled sessions.
+        • <strong>Mid-Term Target (Oct 13):</strong> ${targetAssessment}<br/>
+        • <strong>Total Target Needed:</strong> At least <strong>${totalRequiredForMidterm}</strong> attendances out of <strong>${expectedTotal}</strong> scheduled sessions.
       `;
     }
   }
