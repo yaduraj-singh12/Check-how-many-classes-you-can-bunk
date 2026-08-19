@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JNU CSE | Mid-Term Attendance & Debar Portal</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --green: #22c55e;
+      --green-bg: rgba(34, 197, 94, 0.12);
+      --red: #ef4444;
+      --red-bg: rgba(239, 68, 68, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 820px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 1.75rem;
+      color: var(--primary);
+      margin-bottom: 6px;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-bottom: 20px;
+    }
+
+    .selector-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .selector-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    input, select {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 600px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .subject-info-banner {
+      background: #0f172a;
+      border: 1px dashed var(--card-border);
+      padding: 12px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 16px;
+      line-height: 1.5;
+    }
+
+    .calc-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #0f172a;
+      border: none;
+      font-weight: bold;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 6px;
+      transition: background 0.2s;
+    }
+
+    .calc-btn:hover {
+      background: var(--primary-hover);
+      color: #fff;
+    }
+
+    .status-card {
+      text-align: center;
+      padding: 24px;
+      border-radius: 12px;
+      background: #111e38;
+      border: 1px solid var(--card-border);
+      display: none;
+    }
+
+    .debar-banner {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .debar-eligible {
+      background: var(--green-bg);
+      color: var(--green);
+      border: 1px solid var(--green);
+    }
+
+    .debar-danger {
+      background: var(--red-bg);
+      color: var(--red);
+      border: 1px solid var(--red);
+    }
+
+    .percentage-text {
+      font-size: 3.2rem;
+      font-weight: 800;
+      margin: 6px 0;
+    }
+
+    .status-message {
+      font-size: 1.05rem;
+      line-height: 1.5;
+      color: var(--text);
+    }
+
+    .details-box {
+      margin-top: 16px;
+      padding: 14px;
+      background: #0f172a;
+      border-radius: 8px;
+      text-align: left;
+      font-size: 0.9rem;
+      border-left: 4px solid var(--primary);
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Mid-Term Attendance & Debar Portal</h1>
+    <p>Jaipur National University | SOET — Department of CSE</p>
+  </header>
+
+  <!-- Configuration Card -->
+  <div class="card">
+    <div class="selector-grid">
+      <div class="input-group">
+        <label for="semSelect">Semester</label>
+        <select id="semSelect" onchange="onSemesterChange()">
+          <option value="sem5" selected>B.Tech V Sem</option>
+          <option value="sem3">B.Tech III Sem</option>
+          <option value="sem7">B.Tech VII Sem</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="secSelect">Section</label>
+        <select id="secSelect" onchange="onSectionChange()"></select>
+      </div>
+
+      <div class="input-group">
+        <label for="batchSelect">Batch Group</label>
+        <select id="batchSelect" onchange="populateSubjects()"></select>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label for="subjectSelect">Select Subject / Lab</label>
+      <select id="subjectSelect" onchange="updateSubjectMeta()"></select>
+    </div>
+
+    <div class="subject-info-banner" id="subjectMeta">
+      Loading course metadata...
+    </div>
+
+    <div class="grid-2">
+      <div class="input-group">
+        <label for="attendedClasses">Classes Attended (Present)</label>
+        <input type="number" id="attendedClasses" min="0" placeholder="e.g. 18" />
+      </div>
+      <div class="input-group">
+        <label for="totalClasses">Total Classes Conducted Till Cutoff</label>
+        <input type="number" id="totalClasses" min="0" placeholder="e.g. 24" />
+      </div>
+    </div>
+
+    <button class="calc-btn" onclick="checkAttendance()">Evaluate Mid-Term Debar Status</button>
+  </div>
+
+  <!-- Output Status Card -->
+  <div class="card status-card" id="resultCard">
+    <div id="debarTag" class="debar-banner"></div>
+    <div style="font-size: 0.85rem; color: var(--muted);" id="subResultTitle"></div>
+    <div class="percentage-text" id="pctDisplay">0%</div>
+    <div class="status-message" id="statusMessage"></div>
+    <div class="details-box" id="detailsBox"></div>
+  </div>
+</div>
+
+<script>
+  const timetableHierarchy = {
+    sem5: {
+      sections: {
+        "Sec C": {
+          batches: {
+            "C1": [
+              { name: "Advance Python", code: "BTECSCO50T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Lokesh Meena" },
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Database Management System", code: "BTECSCO503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Neeraj Tiwari" },
+              { name: "Software Engineering", code: "BTECSDS501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Avinash Rai" },
+              { name: "Distributed Data Bases (GE)", code: "BTECSGE502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Bablu Kanojia" },
+              { name: "Computer Graphics", code: "BTECSCO501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Pratima Mall" },
+              { name: "Intro to R Programming", code: "BTECSSE50TP24", type: "Theory", weekly: "1 hr/wk", faculty: "Mr. Kalyan Samanta" },
+              { name: "Seminar", code: "SEMINAR", type: "Session", weekly: "2 hrs/wk", faculty: "Dr. Sunil Gupta" },
+              { name: "Computer Graphics Lab", code: "BTECSCO501P24", type: "Lab", weekly: "2-hr block (Tue, SL1)", faculty: "Ms. Pratima Mall" },
+              { name: "Advance Python Lab", code: "BTECSCO502P24", type: "Lab", weekly: "2-hr block (Wed, SL1)", faculty: "Mr. Lokesh Meena" },
+              { name: "DBMS Lab", code: "BTECSC0503P24", type: "Lab", weekly: "2-hr block (Thu, SL9)", faculty: "Mr. Shashank Jha" },
+              { name: "Java Programming Lab", code: "BTECSC0504P24", type: "Lab", weekly: "2-hr block (Fri, SL9)", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "R Programming Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Sat, FL3)", faculty: "Mr. Kalyan Samanta" }
+            ],
+            "C2": [
+              { name: "Advance Python", code: "BTECSCO50T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Lokesh Meena" },
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Database Management System", code: "BTECSCO503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Neeraj Tiwari" },
+              { name: "Software Engineering", code: "BTECSDS501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Avinash Rai" },
+              { name: "Distributed Data Bases (GE)", code: "BTECSGE502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Bablu Kanojia" },
+              { name: "Computer Graphics", code: "BTECSCO501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Pratima Mall" },
+              { name: "Intro to R Programming", code: "BTECSSE50TP24", type: "Theory", weekly: "1 hr/wk", faculty: "Mr. Kalyan Samanta" },
+              { name: "Seminar", code: "SEMINAR", type: "Session", weekly: "2 hrs/wk", faculty: "Dr. Sunil Gupta" },
+              { name: "Intro to R Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Tue, TL1)", faculty: "Mr. Kalyan Samanta" },
+              { name: "DBMS Lab", code: "BTECSC0503P24", type: "Lab", weekly: "2-hr block (Wed, SL9)", faculty: "Mr. Shashank Jha" },
+              { name: "Java Programming Lab", code: "BTECSC0504P24", type: "Lab", weekly: "2-hr block (Thu, FL5)", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Advance Python Lab", code: "BTECSC0502P24", type: "Lab", weekly: "2-hr block (Fri, TL1)", faculty: "Mr. Lokesh Meena" },
+              { name: "Computer Graphics Lab", code: "BTECSC0501P24", type: "Lab", weekly: "2-hr block (Sat, SL9)", faculty: "Ms. Pratima Mall" }
+            ]
+          }
+        },
+        "Sec A": {
+          batches: {
+            "A1": [
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Database Management System", code: "BTECSCO503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Pratima Mall" },
+              { name: "Advance Python", code: "BTECSCO50T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Dibyojit Ghoshal" },
+              { name: "Computer Graphics", code: "BTECSCO501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Software Engineering", code: "BTECSDS501T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Tarun Prakash Sharma" },
+              { name: "GE Distributed Data Bases", code: "BTECSGE502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Bablu Kanojia" },
+              { name: "Intro to R Programming", code: "BTECSSE50TP24", type: "Theory", weekly: "1 hr/wk", faculty: "Mr. Kalyan Samanta" },
+              { name: "Computer Graphics Lab", code: "BTECSCO501P24", type: "Lab", weekly: "2-hr block (Mon, SL9)", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Java Programming Lab", code: "BTECSCO504P24", type: "Lab", weekly: "2-hr block (Tue, TL1)", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "DBMS Lab", code: "BTECSCO503P24", type: "Lab", weekly: "2-hr block (Wed, TL1)", faculty: "Ms. Pratima Mall" },
+              { name: "Intro to R Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Thu, TL1)", faculty: "Mr. Kalyan Samanta" },
+              { name: "Advance Python Lab", code: "BTECSCO50P24", type: "Lab", weekly: "2-hr block (Fri, TL4)", faculty: "Mr. Dibyojit Ghoshal" }
+            ],
+            "A2": [
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Database Management System", code: "BTECSCO503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Pratima Mall" },
+              { name: "Advance Python", code: "BTECSCO50T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Dibyojit Ghoshal" },
+              { name: "Computer Graphics", code: "BTECSCO501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Software Engineering", code: "BTECSDS501T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Tarun Prakash Sharma" },
+              { name: "GE Distributed Data Bases", code: "BTECSGE502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Bablu Kanojia" },
+              { name: "Intro to R Programming", code: "BTECSSE50TP24", type: "Theory", weekly: "1 hr/wk", faculty: "Mr. Kalyan Samanta" },
+              { name: "Advance Python Lab", code: "BTECSCO50P24", type: "Lab", weekly: "2-hr block (Mon, TL1)", faculty: "Mr. Dibyojit Ghoshal" },
+              { name: "DBMS Lab", code: "BTECSCO503P24", type: "Lab", weekly: "2-hr block (Tue, SL9)", faculty: "Ms. Pratima Mall" },
+              { name: "Intro to R Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Thu, TL1)", faculty: "Mr. Kalyan Samanta" },
+              { name: "Computer Graphics Lab", code: "BTECSCO501P24", type: "Lab", weekly: "2-hr block (Thu, TL3)", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Java Programming Lab", code: "BTECSCO504P24", type: "Lab", weekly: "2-hr block (Fri, TL1)", faculty: "Dr. Satish Chandra Pandey" }
+            ]
+          }
+        },
+        "Sec B": {
+          batches: {
+            "B1": [
+              { name: "Advance Python", code: "BTECSCO50T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Lokesh Meena" },
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Database Management System", code: "BTECSCO503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Neeraj Tiwari" },
+              { name: "Software Engineering", code: "BTECSDS501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Avinash Rai" },
+              { name: "Distributed Data Bases (GE)", code: "BTECSGE502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Bablu Kanojia" },
+              { name: "Computer Graphics", code: "BTECSCO501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Pratima Mall" },
+              { name: "Computer Graphics Lab", code: "BTECSCO501P24", type: "Lab", weekly: "2-hr block (Mon, TL1)", faculty: "Ms. Pratima Mall" },
+              { name: "DBMS Lab", code: "BTECSCO503P24", type: "Lab", weekly: "2-hr block (Tue, TL4)", faculty: "Dr. Neeraj Tiwari" },
+              { name: "Intro to R Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Wed, TL3)", faculty: "Mr. Dibyojit Ghoshal" },
+              { name: "Java Programming Lab", code: "BTECSCO504P24", type: "Lab", weekly: "2-hr block (Fri, TL1)", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Advance Python Lab", code: "BTECSCO502P24", type: "Lab", weekly: "2-hr block (Sat, FL5)", faculty: "Mr. Lokesh Meena" }
+            ],
+            "B2": [
+              { name: "Advance Python", code: "BTECSCO50T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Lokesh Meena" },
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Database Management System", code: "BTECSCO503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Neeraj Tiwari" },
+              { name: "Software Engineering", code: "BTECSDS501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Avinash Rai" },
+              { name: "Distributed Data Bases (GE)", code: "BTECSGE502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Bablu Kanojia" },
+              { name: "Computer Graphics", code: "BTECSCO501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Pratima Mall" },
+              { name: "Advance Python Lab", code: "BTECSCO502P24", type: "Lab", weekly: "2-hr block (Mon, TL4)", faculty: "Mr. Lokesh Meena" },
+              { name: "Intro to R Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Tue, TL2)", faculty: "Mr. Dibyojit Ghoshal" },
+              { name: "Java Programming Lab", code: "BTECSCO504P24", type: "Lab", weekly: "2-hr block (Wed, TL2)", faculty: "Dr. Satish Chandra Pandey" },
+              { name: "Computer Graphics Lab", code: "BTECSCO501P24", type: "Lab", weekly: "2-hr block (Thu, TL2)", faculty: "Ms. Pratima Mall" },
+              { name: "DBMS Lab", code: "BTECSCO503P24", type: "Lab", weekly: "2-hr block (Sat, TL2)", faculty: "Dr. Neeraj Tiwari" }
+            ]
+          }
+        },
+        "Sec D": {
+          batches: {
+            "D1": [
+              { name: "Advanced Python", code: "BTECSCO502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Tarun Prakash Sharma" },
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Nandini Gupta" },
+              { name: "DBMS", code: "BTECSC0503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Abhishek Kumar" },
+              { name: "Software Engineering", code: "BTECSDS501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Akshat Srivastava" },
+              { name: "Computer Graphics", code: "BTECSC0501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "NF-1" },
+              { name: "Computer Graphics Lab", code: "BTECSC0501P24", type: "Lab", weekly: "2-hr block (Mon, SL9)", faculty: "NF-1" },
+              { name: "Advanced Python Lab", code: "BTECSC0502P24", type: "Lab", weekly: "2-hr block (Tue, SL1)", faculty: "Mr. Tarun Prakash Sharma" },
+              { name: "Java Lab", code: "BTECSC0504P24", type: "Lab", weekly: "2-hr block (Thu, FL3)", faculty: "Ms. Nandini Gupta" },
+              { name: "DBMS Lab", code: "BTECSC0503P24", type: "Lab", weekly: "2-hr block (Fri, TL4)", faculty: "Mr. Abhishek Kumar" },
+              { name: "Intro to R Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Sat, FL5)", faculty: "Mr. Dibyojit Ghoshal" }
+            ],
+            "D2": [
+              { name: "Advanced Python", code: "BTECSC0502T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Tarun Prakash Sharma" },
+              { name: "Programming in Java", code: "BTECSCO504T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Nandini Gupta" },
+              { name: "DBMS", code: "BTECSC0503T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Abhishek Kumar" },
+              { name: "Software Engineering", code: "BTECSDS501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Akshat Srivastava" },
+              { name: "Computer Graphics", code: "BTECSC0501T24", type: "Theory", weekly: "3 hrs/wk", faculty: "NF-1" },
+              { name: "Advanced Python Lab", code: "BTECSC0502P24", type: "Lab", weekly: "2-hr block (Mon, SL1)", faculty: "Mr. Tarun Prakash Sharma" },
+              { name: "Computer Graphics Lab", code: "BTECSC0501P24", type: "Lab", weekly: "2-hr block (Tue, FL3)", faculty: "NF-1" },
+              { name: "Intro to R Lab", code: "BTECSSE501P24", type: "Lab", weekly: "2-hr block (Thu, FL5)", faculty: "Mr. Dibyojit Ghoshal" },
+              { name: "Java Lab", code: "BTECSC0504P24", type: "Lab", weekly: "2-hr block (Fri, SL1)", faculty: "Ms. Nandini Gupta" },
+              { name: "DBMS Lab", code: "BTECSC0503P24", type: "Lab", weekly: "2-hr block (Sat, SL1)", faculty: "Mr. Abhishek Kumar" }
+            ]
+          }
+        }
+      }
+    },
+    sem3: {
+      sections: {
+        "Sec A": {
+          batches: {
+            "A1": [
+              { name: "Mathematics III", code: "BTECSCO301T22", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Nitin Chauhan" },
+              { name: "Digital Electronics", code: "BTECSC0303T22", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Puneet Kaliya" },
+              { name: "Data Structure & Algorithms", code: "BTECSCO302T25", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Discrete Mathematical Structure", code: "BTECSDS301T24", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Praveen Kumar" },
+              { name: "Object Oriented Programming (C++)", code: "BTECSCO304T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Akshat" },
+              { name: "Digital Electronics Lab", code: "BTECSCO303P24", type: "Lab", weekly: "2-hr block (Mon, SL3)", faculty: "Mr. Puneet Kalia" },
+              { name: "OOP Lab", code: "BTECSCO304P24", type: "Lab", weekly: "2-hr block (Wed, SL1)", faculty: "Mr. Akshat" },
+              { name: "DSA Lab", code: "BTECSCO302T25", type: "Lab", weekly: "2-hr block (Thu, SL1)", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Web Design Lab", code: "BTECSC0301P24", type: "Lab", weekly: "2-hr block (Fri, FL3)", faculty: "Mr. Tarun Sharma" }
+            ],
+            "A2": [
+              { name: "Mathematics III", code: "BTECSCO301T22", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Nitin Chauhan" },
+              { name: "Digital Electronics", code: "BTECSC0303T22", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Puneet Kaliya" },
+              { name: "Data Structure & Algorithms", code: "BTECSCO302T25", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Discrete Mathematical Structure", code: "BTECSDS301T24", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Praveen Kumar" },
+              { name: "Object Oriented Programming (C++)", code: "BTECSCO304T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Akshat" },
+              { name: "OOP Lab", code: "BTECSCO304P24", type: "Lab", weekly: "2-hr block (Mon, FL3)", faculty: "Mr. Akshat" },
+              { name: "DSA Lab", code: "BTECSCO302T25", type: "Lab", weekly: "2-hr block (Tue, FL3)", faculty: "Mr. Hitendra Agarwal" },
+              { name: "Web Design Lab", code: "BTECSC0301P24", type: "Lab", weekly: "2-hr block (Thu, SL9)", faculty: "Mr. Tarun Sharma" },
+              { name: "Digital Electronics Lab", code: "BTECSCO303P24", type: "Lab", weekly: "2-hr block (Fri, SL3)", faculty: "Mr. Puneet Kalia" }
+            ]
+          }
+        },
+        "Sec C": {
+          batches: {
+            "C1": [
+              { name: "Mathematics III", code: "BTECSCO301T22", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Nitin Chauhan" },
+              { name: "Digital Electronics", code: "BTECSCO303T22", type: "Theory", weekly: "4 hrs/wk", faculty: "CS Rajora" },
+              { name: "Data Structures & Algorithms", code: "BTECSC0302T25", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Sunil Gupta" },
+              { name: "Discrete Mathematical Structure", code: "BTECSDS301T24", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Praveen Kumar" },
+              { name: "OOPs (C++)", code: "BTECSCO304T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Nandini Gupta" },
+              { name: "OOP's Lab", code: "BTECSCO304P24", type: "Lab", weekly: "2-hr block (Mon, FL4)", faculty: "Ms. Nandini Gupta" },
+              { name: "DSA Lab", code: "BTECSCO302P25", type: "Lab", weekly: "2-hr block (Tue, FL4)", faculty: "Dr. Sunil Gupta" },
+              { name: "Digital Electronics Lab", code: "BTECSCO303P24", type: "Lab", weekly: "2-hr block (Wed, SL3)", faculty: "Mr. Anil Agarwal" },
+              { name: "Web Design Lab", code: "BTECSCO301P24", type: "Lab", weekly: "2-hr block (Fri, FL4)", faculty: "Mr. Kalyan Samanta" }
+            ],
+            "C2": [
+              { name: "Mathematics III", code: "BTECSCO301T22", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Nitin Chauhan" },
+              { name: "Digital Electronics", code: "BTECSCO303T22", type: "Theory", weekly: "4 hrs/wk", faculty: "CS Rajora" },
+              { name: "Data Structures & Algorithms", code: "BTECSC0302T25", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Sunil Gupta" },
+              { name: "Discrete Mathematical Structure", code: "BTECSDS301T24", type: "Theory", weekly: "4 hrs/wk", faculty: "Mr. Praveen Kumar" },
+              { name: "OOPs (C++)", code: "BTECSCO304T24", type: "Theory", weekly: "3 hrs/wk", faculty: "Ms. Nandini Gupta" },
+              { name: "Web Design Lab", code: "BTECSCO301P24", type: "Lab", weekly: "2-hr block (Mon, FL5)", faculty: "Mr. Kalyan Samanta" },
+              { name: "OOP's Lab", code: "BTECSCO304P24", type: "Lab", weekly: "2-hr block (Tue, FL5)", faculty: "Ms. Nandini Gupta" },
+              { name: "DSA Lab", code: "BTECSCO302P25", type: "Lab", weekly: "2-hr block (Thu, FL4)", faculty: "Dr. Sunil Gupta" },
+              { name: "Digital Electronics Lab", code: "BTECSCO303P24", type: "Lab", weekly: "2-hr block (Fri, SL3)", faculty: "Mr. Anil Agarwal" }
+            ]
+          }
+        }
+      }
+    },
+    sem7: {
+      sections: {
+        "Sec A & B (Combined)": {
+          batches: {
+            "Batch A": [
+              { name: "Compiler Construction", code: "BTECSCO701T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Neeraj Tiwari" },
+              { name: "Android Programming", code: "BTECSCO703T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Abhishek Kumar" },
+              { name: "RDBMS", code: "BTECSC0702T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Sunil Sharma" },
+              { name: "Data Mining & Warehousing", code: "BTECSDS703T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Lokesh Meena" },
+              { name: "RDBMS Lab", code: "BTECSCO702P22", type: "Lab", weekly: "2-hr block (Mon, TL2)", faculty: "Mr. Sunil Sharma" },
+              { name: "Compiler Construction Lab", code: "BTECSCO701P22", type: "Lab", weekly: "2-hr block (Fri, TL4)", faculty: "Mr. Shashank Jha" },
+              { name: "Android Programming Lab", code: "BTECSCO703T22", type: "Lab", weekly: "2-hr block (Thu, TL4)", faculty: "Mr. Bablu Kanojia" }
+            ],
+            "Batch B": [
+              { name: "Compiler Construction", code: "BTECSCO701T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Dr. Neeraj Tiwari" },
+              { name: "Android Programming", code: "BTECSCO703T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Abhishek Kumar" },
+              { name: "RDBMS", code: "BTECSC0702T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Sunil Sharma" },
+              { name: "Data Mining & Warehousing", code: "BTECSDS703T22", type: "Theory", weekly: "3 hrs/wk", faculty: "Mr. Lokesh Meena" },
+              { name: "Android Programming Lab", code: "BTECSCO703T22", type: "Lab", weekly: "2-hr block (Mon, TL3)", faculty: "Mr. Abhishek Kumar" },
+              { name: "Compiler Construction Lab", code: "BTECSCO701P22", type: "Lab", weekly: "2-hr block (Thu, TL3)", faculty: "Mr. Shashank Jha" },
+              { name: "RDBMS Lab", code: "BTECSCO702P22", type: "Lab", weekly: "2-hr block (Fri, TL2)", faculty: "Mr. Sunil Sharma" }
+            ]
+          }
+        }
+      }
+    }
+  };
+
+  function onSemesterChange() {
+    const sem = document.getElementById('semSelect').value;
+    const secSelect = document.getElementById('secSelect');
+    secSelect.innerHTML = '';
+    
+    Object.keys(timetableHierarchy[sem].sections).forEach(sec => {
+      const opt = document.createElement('option');
+      opt.value = sec;
+      opt.text = sec;
+      secSelect.appendChild(opt);
+    });
+    
+    onSectionChange();
+  }
+
+  function onSectionChange() {
+    const sem = document.getElementById('semSelect').value;
+    const sec = document.getElementById('secSelect').value;
+    const batchSelect = document.getElementById('batchSelect');
+    batchSelect.innerHTML = '';
+
+    const batches = timetableHierarchy[sem].sections[sec].batches;
+    Object.keys(batches).forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b;
+      opt.text = `Batch ${b}`;
+      batchSelect.appendChild(opt);
+    });
+
+    populateSubjects();
+  }
+
+  function populateSubjects() {
+    const sem = document.getElementById('semSelect').value;
+    const sec = document.getElementById('secSelect').value;
+    const batch = document.getElementById('batchSelect').value;
+    const subSelect = document.getElementById('subjectSelect');
+    subSelect.innerHTML = '';
+
+    const subjects = timetableHierarchy[sem].sections[sec].batches[batch] || [];
+    subjects.forEach((sub, idx) => {
+      const opt = document.createElement('option');
+      opt.value = idx;
+      opt.text = `${sub.name} (${sub.type})`;
+      subSelect.appendChild(opt);
+    });
+
+    updateSubjectMeta();
+  }
+
+  function updateSubjectMeta() {
+    const sem = document.getElementById('semSelect').value;
+    const sec = document.getElementById('secSelect').value;
+    const batch = document.getElementById('batchSelect').value;
+    const idx = document.getElementById('subjectSelect').value;
+    const sub = timetableHierarchy[sem].sections[sec].batches[batch][idx];
+
+    if (!sub) return;
+    document.getElementById('subjectMeta').innerHTML = `
+      <strong>Course Code:</strong> ${sub.code} &nbsp;|&nbsp;
+      <strong>Faculty:</strong> ${sub.faculty} &nbsp;|&nbsp;
+      <strong>Timetable Slot:</strong> ${sub.weekly}
+    `;
+  }
+
+  function checkAttendance() {
+    const total = parseInt(document.getElementById('totalClasses').value);
+    const attended = parseInt(document.getElementById('attendedClasses').value);
+    const sem = document.getElementById('semSelect').value;
+    const sec = document.getElementById('secSelect').value;
+    const batch = document.getElementById('batchSelect').value;
+    const idx = document.getElementById('subjectSelect').value;
+    const sub = timetableHierarchy[sem].sections[sec].batches[batch][idx];
+
+    const resultCard = document.getElementById('resultCard');
+    const debarTag = document.getElementById('debarTag');
+    const pctDisplay = document.getElementById('pctDisplay');
+    const statusMsg = document.getElementById('statusMessage');
+    const detailsBox = document.getElementById('detailsBox');
+    const subResultTitle = document.getElementById('subResultTitle');
+
+    if (isNaN(total) || isNaN(attended) || total <= 0 || attended < 0 || attended > total) {
+      alert("Please enter valid class counts (Attended classes cannot exceed total classes conducted).");
+      return;
+    }
+
+    const pct = ((attended / total) * 100).toFixed(1);
+    subResultTitle.innerText = `${sub.name} [${sub.code}] — ${sec} (${batch})`;
+    pctDisplay.innerText = `${pct}%`;
+    resultCard.style.display = 'block';
+
+    if (pct >= 75) {
+      pctDisplay.style.color = "var(--green)";
+      debarTag.className = "debar-banner debar-eligible";
+      debarTag.innerText = "✓ ELIGIBLE FOR MID-TERM EXAM";
+
+      const safeBunks = Math.floor((4 * attended - 3 * total) / 3);
+      statusMsg.innerHTML = `You are safe from the Mid-Term debar list in <strong>${sub.name}</strong>.`;
+      detailsBox.innerHTML = `
+        • <strong>Safe Bunk Allowance:</strong> You can safely skip <strong>${safeBunks}</strong> consecutive class(es) without falling below the 75% cutoff.<br/>
+        • <strong>Attendance Margin:</strong> You are currently <strong>${attended - Math.ceil(0.75 * total)}</strong> class(es) ahead of the minimum requirement.
+      `;
+    } else {
+      pctDisplay.style.color = "var(--red)";
+      debarTag.className = "debar-banner debar-danger";
+      debarTag.innerText = "⚠ DEBARRED FROM MID-TERMS (BELOW 75%)";
+
+      const requiredClasses = Math.ceil(3 * total - 4 * attended);
+      statusMsg.innerHTML = `Your attendance in <strong>${sub.name}</strong> is under the mandatory 75% threshold.`;
+      detailsBox.innerHTML = `
+        • <strong>Required Consecutive Classes:</strong> You must attend the next <strong>${requiredClasses}</strong> consecutive lecture(s)/lab(s) with 100% presence to lift the debar status.<br/>
+        • <strong>Current Shortfall:</strong> You are <strong>${Math.ceil(0.75 * total) - attended}</strong> attended class(es) behind the 75% requirement.
+      `;
+    }
+  }
+
+  // Initial Load
+  onSemesterChange();
+</script>
+
+</body>
+</html>
